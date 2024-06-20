@@ -1,23 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class AgentController : MonoBehaviour
 {
-    public enum Team
-    {
-        Red, Blue
-    }
-
     public Transform goal;
     public Team team;
 
-    float speed;
+    bool isGoal;
     NavMeshAgent agent;
 
-    public void Move(Transform target)
+    private void Awake()
     {
-        //Move agent to target
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    private void Start()
+    {
+        isGoal = false;
+    }
+
+    private void Update()
+    {
+        Goal();
+    }
+
+    public void Move()
+    {
+        agent.speed = Random.Range(4f, 6f);
+        agent.SetDestination(goal.position);
+    }
+
+    public void Goal()
+    {
+        if (Vector3.Distance(this.gameObject.transform.position, goal.transform.position) <= 3f && !isGoal)
+        {
+            SoundManager.Instance.PlaySound("Goal");
+            if (team == Team.Red) GameManager.Instance.resultRed++;
+            else GameManager.Instance.resultBlue++;
+            UIManager.Instance.UpdateScore();
+            isGoal = true;
+        }
     }
 }
